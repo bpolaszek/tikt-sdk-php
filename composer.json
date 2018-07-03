@@ -1,0 +1,12 @@
+{
+  "name": "@unitylab/tikt-sdk-php",
+  "version": "0.1.0-dev",
+  "license": "MIT",
+  "type": "library",
+  "require": {
+    "rmccue/requests": "^1.7"
+  },
+  "autoload": {
+    "psr-0": {"Tikt": "src/"}
+  }
+}
