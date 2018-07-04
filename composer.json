@@ -1,5 +1,5 @@
 {
-  "name": "@unitylab/tikt-sdk-php",
+  "name": "tikt-sdk-php",
   "version": "0.1.0-dev",
   "license": "MIT",
   "type": "library",
