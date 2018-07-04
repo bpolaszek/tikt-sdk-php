@@ -43,7 +43,7 @@ try {
 
     list($user, $website) = findDatingUser($datingClient, $productUrn);
 
-    $eravageRecord = [
+    $record = [
       'id' => $payout['id'],
       'id_abonnement' => $user['id'],
       'date' => formatDate($payout['created_at']),
@@ -64,7 +64,7 @@ try {
       'nom_site' => $website['domain_name']
     ];
 
-    var_dump($eravageRecord);
+    var_dump($record);
   }
 } catch(\Exception $e) {
   var_dump($e);
