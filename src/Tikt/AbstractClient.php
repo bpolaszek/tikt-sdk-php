@@ -6,6 +6,7 @@ class AbstractClient {
   const ALLOWED_STATUS_CODES = [200, 201, 204];
   const IAM1_HMAC_SHA256_TOKEN = 'IAM1-HMAC-SHA256 credentials=%s; date=%s; signature=%s';
   const SESSION_TOKEN_HEADER = 'Bearer %s';
+  const DEFAULT_ENDPOINT = null;
 
   public $endpoint = null;
   public $accessKeyId = null;
@@ -14,10 +15,7 @@ class AbstractClient {
   public $sessionToken = null;
 
   public function __construct($options = []) {
-    if (!isset($options['endpoint'])) {
-      throw new Exception('you must provide an endpoint URL');
-    }
-    $this->endpoint = $options['endpoint'];
+    $this->endpoint = isset($options['endpoint']) ? $options['endpoint'] : static::DEFAULT_ENDPOINT;
     $this->accessKeyId = isset($options['access_key_id']) ? $options['access_key_id'] : \Tikt::getConfigValue('access_key_id');
     $this->accessSecretKey = isset($options['access_secret_key']) ? $options['access_secret_key'] : \Tikt::getConfigValue('access_secret_key');
     $this->binaryAccessSecretKey = !is_null($this->accessSecretKey) ? $this->decodeSecretKey($this->accessSecretKey) : null;

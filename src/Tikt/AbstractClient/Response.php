@@ -11,6 +11,22 @@ class Response {
     $this->context = $response;
   }
 
+  public function __get($key) {
+    var_dump($this->data);
+    if (isset($this->data[$key])) {
+      return $this->data[$key];
+    }
+    return parent::__get($key);
+  }
+
+  public function getCode() {
+    return $this->code;
+  }
+
+  public function getData() {
+    return $this->data;
+  }
+
   public function getBody() {
     return $response->body;
   }
