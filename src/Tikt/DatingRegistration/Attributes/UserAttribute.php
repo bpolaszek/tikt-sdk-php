@@ -1,6 +1,6 @@
 <?php
 
-namespace Tikt\Registration\Attributes;
+namespace Tikt\DatingRegistration\Attributes;
 
 class UserAttribute extends BaseAttribute {
   public function setBirthday($value) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tikt\Registration\Attributes;
+namespace Tikt\DatingRegistration\Attributes;
 
 class BaseAttribute implements \JsonSerializable {
   public function __construct($options = []) {

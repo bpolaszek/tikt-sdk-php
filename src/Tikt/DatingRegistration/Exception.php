@@ -1,6 +1,6 @@
 <?php
 
-namespace Tikt\Registration;
+namespace Tikt\DatingRegistration;
 
 /**
  * base class for all Registration exceptions

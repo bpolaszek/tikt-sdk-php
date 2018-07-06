@@ -1,6 +1,6 @@
 <?php
 
-namespace Tikt\Registration;
+namespace Tikt\DatingRegistration;
 
 /**
  * throwed when trying to set a Registration attribute that doesn't exists
@@ -13,7 +13,7 @@ class ResponseInvalidException extends Exception {
   public function __construct(\Requests_Response $response) {
     $this->response = $response;
     $this->data = json_decode($response->body, true);
-    $this->message = $this->data['message'];
+    $this->message = isset($this->data['message']) ? $this->data['message'] : null;
   }
 
   public function getResponse() {

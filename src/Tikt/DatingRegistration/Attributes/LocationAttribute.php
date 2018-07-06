@@ -1,6 +1,6 @@
 <?php
 
-namespace Tikt\Registration\Attributes;
+namespace Tikt\DatingRegistration\Attributes;
 
 class LocationAttribute extends BaseAttribute {
 }

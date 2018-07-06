@@ -1,6 +1,6 @@
 <?php
 
-namespace Tikt\Registration;
+namespace Tikt\DatingRegistration;
 
 /**
  * throwed when trying to set a Registration attribute that doesn't exists
