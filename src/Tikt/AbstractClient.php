@@ -1,6 +1,7 @@
 <?php
 
 namespace Tikt;
+use GuzzleHttp\Psr7\Request;
 
 class AbstractClient {
   const ALLOWED_STATUS_CODES = [200, 201, 204];
@@ -13,6 +14,7 @@ class AbstractClient {
   public $accessSecretKey = null;
   private $binaryAccessSecretKey = null;
   public $sessionToken = null;
+  private $client = null;
 
   public function __construct($options = []) {
     $this->endpoint = isset($options['endpoint']) ? $options['endpoint'] : static::DEFAULT_ENDPOINT;
@@ -23,26 +25,34 @@ class AbstractClient {
   }
 
   public function executeAction(
-    $method = \Requests::GET, $actionName, $data = null, $options = []
+    $method = 'GET', $actionName, $data = null, $options = []
   ) {
     $headers = $this->buildHeaders(
       isset($options['headers']) ? $options['headers'] : []
     );
-    $response = \Requests::request(
-      $this->getActionUrl($actionName), $headers, $data, $method, $options
+    if ($method == 'GET') {
+      $urlParameters = array_merge([], $data, [ 'action' => $actionName ]);
+    } else {
+      $urlParameters = [ 'action' => $actionName ];
+    }
+    if ($method == 'GET') { $data = null; }
+    $request = new Request(
+      $method, '/?' . \http_build_query($urlParameters), $headers, $data
     );
-    if (!in_array($response->status_code, self::ALLOWED_STATUS_CODES)) {
-      throw new AbstractClient\ResponseError($response);
+    try {
+      $response = $this->getClient()->send($request);
+    } catch(\GuzzleHttp\Exception\ClientException $e) {
+      throw new AbstractClient\ResponseError($e->getResponse());
     }
     return new AbstractClient\Response($response);
   }
 
   public function executeGetAction($actionName, $params = [], $options = []) {
-    return $this->executeAction(\Requests::GET, $actionName, $params, $options);
+    return $this->executeAction('GET', $actionName, $params, $options);
   }
 
   public function executePostAction($actionName, $data, $options = []) {
-    return $this->executeAction(\Requests::POST, $actionName, $data, $options);
+    return $this->executeAction('POST', $actionName, $data, $options);
   }
 
   private function getActionUrl($actionName) {
@@ -68,7 +78,7 @@ class AbstractClient {
     ]);
   }
 
-  function decodeSecretKey($string) {
+  private function decodeSecretKey($string) {
     $data = str_replace(array('-','_'),array('+','/'),$string);
     $mod4 = strlen($data) % 4;
     if ($mod4) {
@@ -76,4 +86,19 @@ class AbstractClient {
     }
     return base64_decode($data);
   }
+
+  private function getClient() {
+    if (is_null($this->client)) {
+      $options = [
+        'base_uri' => $this->endpoint,
+        'timeout' => 10.0
+      ];
+      if (!is_null(\Tikt::getConfigValue('http.proxy'))) {
+        $options['proxy'] = \Tikt::getConfigValue('http.proxy');
+      }
+      $this->client = new \GuzzleHttp\Client($options);
+    }
+    return $this->client;
+  }
+
 }

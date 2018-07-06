@@ -26,6 +26,7 @@ class Registration {
   const SITE_SEGMENT_SOFT = 1;
   const SITE_SEGMENT_SEXY = 2;
   const SITE_SEGMENT_HARD = 3;
+
   private $client = null;
   private $attributes = null;
   private $parameters = null;
@@ -42,6 +43,15 @@ class Registration {
     }
   }
 
+  /**
+   * set a tracker value, current allowed trackers are:
+   *  - t1
+   *  - t2
+   * t1 + t2 values size should not exceed 4 KB
+   * @param string $name Tracker name
+   * @param string $value Tracker value
+   * @return self
+   */
   public function setTracker($name, $value) {
     if (!in_array($name, self::ALLOWED_TRACKERS)) {
       throw new Exception(sprintf('trackers.%s.unknown', $name));
@@ -50,18 +60,34 @@ class Registration {
     return $this;
   }
 
+  /**
+   * set your affiliate details
+   * @param int $id Your affiliate ID
+   * @param string|null $campaignId Free text input that allows you to group your leads
+   */
   public function setAffiliate($id, $campaignId = null) {
     $this->parameters['ai'] = $id;
     if (!is_null($campaignId)) { $this->parameters['aci'] = $campaignId; }
     return $this;
   }
 
+  /**
+   * define the maximum segment that is allowed when selecting targetted website
+   * $upper boolean allowed the website selector to fallback on a higher segment
+   * if no websites have been with the provided $max segment
+   * @param int $max Max segment
+   * @param bool $upper true/false
+   */
   public function setSiteSegment($max, $upper = false) {
     $this->parameters['sg'] = intval($max);
     $this->parameters['us'] = $upper == true ? 1 : 0;
     return $this;
   }
 
+  /**
+   * Force a specific website to be tried first, if force is false it will fallback
+   * to the default website selection
+   */
   public function setSite($id, $force = false) {
     $this->parameters['si'] = intval($id);
     $this->parameters['fs'] = $force == true ? 1 : 0;

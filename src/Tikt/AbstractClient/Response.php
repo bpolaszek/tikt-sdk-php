@@ -5,9 +5,9 @@ namespace Tikt\AbstractClient;
 class Response {
   private $response = null;
 
-  public function __construct(\Requests_Response $response) {
-    $this->code = $response->status_code;
-    $this->data = json_decode($response->body, true);
+  public function __construct(\GuzzleHttp\Psr7\Response $response) {
+    $this->code = $response->getStatusCode();
+    $this->data = json_decode($response->getBody(), true);
     $this->context = $response;
   }
 
@@ -28,6 +28,6 @@ class Response {
   }
 
   public function getBody() {
-    return $response->body;
+    return $response->getBody();
   }
 }
