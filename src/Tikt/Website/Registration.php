@@ -8,15 +8,6 @@ class Registration {
     'type' => 'Male',
     'country' => 'FR'
   ];
-  const REQUEST_BODY_ATTRIBUTES_MAP = [
-    'type' => 'user.type',
-    'email' => 'user.email',
-    'password' => 'user.password',
-    'first_name' => 'user.first_name',
-    'birthday' => 'user.birthday',
-    'postal_code' => 'location.postal_code',
-    'country' => 'location.country'
-  ];
   const ALLOWED_TRACKERS = ['t1', 't2'];
   const DEFAULT_HEADERS = [
     'Accept' => 'application/json',
@@ -34,11 +25,7 @@ class Registration {
   public function __construct($attributes = []) {
     $this->parameters = new \ArrayObject();
     $this->attributes = new \ArrayObject(self::DEFAULT_ATTRIBUTES);
-    $allowedAttributes = array_keys(self::REQUEST_BODY_ATTRIBUTES_MAP);
     foreach($attributes as $key => $value) {
-      if (!in_array($key, $allowedAttributes)) {
-        throw new \Exception(sprintf('attribute.%s.unknown', $key));
-      }
       $this->attributes[$key] = $value;
     }
   }
@@ -102,7 +89,8 @@ class Registration {
     $urlParameters = http_build_query($this->getParameters()->getArrayCopy());
     $requestBody = json_encode($this->buildRequestBody());
     $request = new Request(
-      'POST', '/register?' . $urlParameters, self::DEFAULT_HEADERS, $requestBody
+      'POST', '/partner/register?' . $urlParameters, self::DEFAULT_HEADERS,
+      $requestBody
     );
     try {
       $response = $this->getClient()->send($request);
@@ -131,21 +119,16 @@ class Registration {
     foreach(
       $this->attributes as $attributeName => $attributeValue
     ) {
-      if (!is_null(self::REQUEST_BODY_ATTRIBUTES_MAP[$attributeName])) {
-        $requestAttributePath = self::REQUEST_BODY_ATTRIBUTES_MAP[$attributeName];
-      } else {
-        $requestAttributePath = sprintf('user.%s', $attributeName);
-      }
       $hash = $data;
-      $requestAttributeSplit = explode('.', $requestAttributePath);
-      $requestAttributeName = array_pop($requestAttributeSplit);
-      foreach($requestAttributeSplit as $namespace) {
-        if (!isset($hash[$namespace])) { $hash[$namespace] = new \ArrayObject(); }
+      $attributeNameSplit = explode('.', $attributeName);
+      $attributeKey = array_pop($attributeNameSplit);
+      foreach($attributeNameSplit as $namespace) {
+        if (!isset($hash[$namespace])) {
+          $hash[$namespace] = new \ArrayObject();
+        }
         $hash = $hash[$namespace];
       }
-      if (isset($this->attributes[$attributeName])) {
-        $hash[$requestAttributeName] = $attributeValue;
-      }
+      $hash[$attributeKey] = $attributeValue;
     }
     return $data;
   }
