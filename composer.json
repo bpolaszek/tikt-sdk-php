@@ -1,8 +1,9 @@
 {
   "name": "unitylab/tikt-sdk-php",
-  "version": "0.1.0-dev",
+  "version": "0.1.0",
   "license": "MIT",
   "type": "library",
+  "minimum-stability": "stable",
   "require": {
     "php": ">=5.6",
     "guzzlehttp/guzzle": "~6.0"
