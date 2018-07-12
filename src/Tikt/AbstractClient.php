@@ -8,6 +8,7 @@ class AbstractClient {
   const IAM1_HMAC_SHA256_TOKEN = 'IAM1-HMAC-SHA256 credentials=%s; date=%s; signature=%s';
   const SESSION_TOKEN_HEADER = 'Bearer %s';
   const DEFAULT_ENDPOINT = null;
+  const ACTIONS = [];
 
   public $endpoint = null;
   public $accessKeyId = null;
@@ -16,12 +17,25 @@ class AbstractClient {
   public $sessionToken = null;
   private $client = null;
 
+  static public function getAvailableActions() {
+    return static::ACTIONS;
+  }
+
   public function __construct($options = []) {
     $this->endpoint = isset($options['endpoint']) ? $options['endpoint'] : static::DEFAULT_ENDPOINT;
     $this->accessKeyId = isset($options['access_key_id']) ? $options['access_key_id'] : \Tikt::getConfigValue('access_key_id');
     $this->accessSecretKey = isset($options['access_secret_key']) ? $options['access_secret_key'] : \Tikt::getConfigValue('access_secret_key');
     $this->binaryAccessSecretKey = !is_null($this->accessSecretKey) ? $this->decodeSecretKey($this->accessSecretKey) : null;
     $this->sessionToken = isset($options['session_token']) ? $options['session_token'] : \Tikt::getConfigValue('session_token');
+  }
+
+  public function __call($name, $arguments) {
+    $actionName = ucfirst($name);
+    if (isset(static::ACTIONS[$actionName])) {
+      $actionMethod = static::ACTIONS[$actionName]['method'];
+      return $this->executeAction($actionMethod, $actionName, $arguments[0]);
+    }
+    throw new \Exception(sprintf('action %s does not exists', $name));
   }
 
   public function executeAction(
@@ -32,19 +46,21 @@ class AbstractClient {
     );
     if ($method == 'GET') {
       $urlParameters = array_merge([], $data, [ 'action' => $actionName ]);
+      $data = null;
     } else {
       $urlParameters = [ 'action' => $actionName ];
+      $data = json_encode($data);
     }
-    if ($method == 'GET') { $data = null; }
     $request = new Request(
       $method, '/?' . \http_build_query($urlParameters), $headers, $data
     );
+
     try {
       $response = $this->getClient()->send($request);
+      return json_decode($response->getBody(), true);
     } catch(\GuzzleHttp\Exception\ClientException $e) {
       throw new AbstractClient\ResponseError($e->getResponse());
     }
-    return new AbstractClient\Response($response);
   }
 
   public function executeGetAction($actionName, $params = [], $options = []) {
