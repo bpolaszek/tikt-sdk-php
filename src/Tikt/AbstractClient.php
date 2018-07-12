@@ -31,7 +31,8 @@ class AbstractClient {
 
   public function __call($name, $arguments) {
     $actionName = ucfirst($name);
-    if (isset(static::ACTIONS[$actionName])) {
+    $actionOptions = static::ACTIONS[$actionName];
+    if (!is_null($actionOptions)) {
       $actionMethod = static::ACTIONS[$actionName]['method'];
       return $this->executeAction($actionMethod, $actionName, $arguments[0]);
     }
