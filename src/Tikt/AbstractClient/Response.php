@@ -12,7 +12,6 @@ class Response {
   }
 
   public function __get($key) {
-    var_dump($this->data);
     if (isset($this->data[$key])) {
       return $this->data[$key];
     }
