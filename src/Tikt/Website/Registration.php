@@ -81,8 +81,23 @@ class Registration {
     return $this;
   }
 
+  public function setParameter($name, $value) {
+    $this->parameters[$name] = $value;
+    return $this;
+  }
+
+  public function setEmailValidationRequired($enabled) {
+    $this->setParameter('eo', $enabled === true ? 1 : 0);
+    return $this;
+  }
+
   public function getParameters() {
     return $this->parameters;
+  }
+
+  public function getPostUrl() {
+    $urlParameters = http_build_query($this->getParameters()->getArrayCopy());
+    return '/partner/register?' . $urlParameters;
   }
 
   public function create() {
