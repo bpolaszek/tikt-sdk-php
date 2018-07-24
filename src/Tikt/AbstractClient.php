@@ -104,7 +104,10 @@ class AbstractClient {
     return base64_decode($data);
   }
 
-  private function getClient() {
+    /**
+     * @return \GuzzleHttp\Client
+     */
+  public function getClient() {
     if (is_null($this->client)) {
       $options = [
         'base_uri' => $this->endpoint,
