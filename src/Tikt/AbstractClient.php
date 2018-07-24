@@ -78,7 +78,7 @@ class AbstractClient {
 
   private function getRequestToken() {
     if (!is_null($this->sessionToken)) {
-      return sprintf(SESSION_TOKEN_HEADER, $this->sessionToken);
+      return sprintf(self::SESSION_TOKEN_HEADER, $this->sessionToken);
     }
     $date = date('c');
     $kDate = hash_hmac('sha256', $date, $this->binaryAccessSecretKey, true);
@@ -104,7 +104,10 @@ class AbstractClient {
     return base64_decode($data);
   }
 
-  private function getClient() {
+    /**
+     * @return \GuzzleHttp\Client
+     */
+  public function getClient() {
     if (is_null($this->client)) {
       $options = [
         'base_uri' => $this->endpoint,
