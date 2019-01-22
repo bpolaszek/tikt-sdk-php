@@ -16,7 +16,7 @@ class URN {
     $matches = [];
     preg_match(self::URN_REGEXP, $value, $matches);
     if (count($matches) < 7) {
-      throw new ProvidedURNInvalidException($value);
+      throw new \Tikt\URN\ProvidedURNInvalidException($value);
     }
     return new self([
       'partition' => $matches[1],
